@@ -22,8 +22,8 @@ def find_zero(s:str) -> int:
         return -1
 
     left = 0
-    right = len(s)
-    while left < right:
+    right = len(s) - 1
+    while left <= right:
         mid = (right - left) // 2 + left
         if s[mid] == '1':
             left = mid+1
