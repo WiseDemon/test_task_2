@@ -14,12 +14,29 @@ def count_appearance(data:dict) -> int:
     lesson = data['lesson']
     pupil = data['pupil']
     tutor = data['tutor']
+    if not pupil or not tutor or not lesson:
+        return 0
+
     appearance = 0
     p_pos = 0
     t_pos = 0
-    while p_pos < len(pupil) and t_pos < len(tutor):
+
+    new_pupil = pupil[:2]
+    # объединение интервалов учеников, если они пересекаются
+    while p_pos < len(pupil):
         p_start = pupil[p_pos]
         p_end = pupil[p_pos + 1]
+        if p_start < new_pupil[-1] and p_end > new_pupil[-2]:
+            new_pupil[-2] = min(p_start, new_pupil[-2])
+            new_pupil[-1] = max(p_end, new_pupil[-1])
+        else:
+            new_pupil.extend([p_start, p_end])
+        p_pos += 2
+    p_pos = 0
+
+    while p_pos < len(new_pupil) and t_pos < len(tutor):
+        p_start = new_pupil[p_pos]
+        p_end = new_pupil[p_pos + 1]
         t_start = tutor[t_pos]
         t_end = tutor[t_pos + 1]
         # проверка на пересечение интервалов
