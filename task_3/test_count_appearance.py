@@ -1,5 +1,5 @@
 import unittest
-from count_appearance import count_appearance
+from count_appearance import *
 
 
 class TestCountAppearance(unittest.TestCase):
@@ -29,6 +29,54 @@ class TestCountAppearance(unittest.TestCase):
              'tutor': [1594692017, 1594692066, 1594692068, 1594696341]},
             'answer': 3565}
         self._test_positive(test_setup)
+
+    def test_failure_garbage_data(self):
+        """
+        Проверка с ошибкой при подаче аргумента не словаря
+        """
+        self.assertRaises(CountAppearanceWrongData, count_appearance, None)
+
+    def test_failure_wrong_dict(self):
+        """
+        Проверка с ошибкой при отсутсвии в списке нужных ключей
+        """
+        data = {'lesson': [11, 14],
+                'pupoll': [10,12,13,14]}
+        self.assertRaises(CountAppearanceWrongData, count_appearance, data)
+
+    def test_failure_not_list(self):
+        """
+        Проверка с ошибкой при неправильном типе значения в словаре
+        """
+        data = {'lesson':1,
+                'pupil':2,
+                'tutor':3}
+        self.assertRaises(CountAppearanceWrongData, count_appearance, data)
+
+    def test_failure_wrong_list_len(self):
+        """
+        Проверка с ошибкой при неправильном количестве элементов в списках
+        """
+        data = {'lesson': [1],
+                'pupil': [1,2,3,4],
+                'tutor': [1,2,3,4]}
+        self.assertRaises(CountAppearanceWrongInterval, count_appearance, data)
+        data['lesson'] = [1,4]
+        data['pupil'] = [1,2,3]
+        self.assertRaises(CountAppearanceWrongInterval, count_appearance, data)
+        data['pupil'] = [1,2,3,4]
+        data['tutor'] = [1,2,3]
+        self.assertRaises(CountAppearanceWrongInterval, count_appearance, data)
+
+    def test_failure_wrong_interval(self):
+        """
+        Проверка с ошибкой, когда начало интервала больше конца интервала
+        :return:
+        """
+        data = {'lesson': [1,2],
+                'pupil': [3,1],
+                'tutor': [1,2,3,4]}
+        self.assertRaises(CountAppearanceWrongInterval, count_appearance, data)
 
 
 if __name__ == '__main__':

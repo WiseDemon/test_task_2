@@ -1,3 +1,24 @@
+class CountAppearanceException(Exception):
+    """
+    Ошибка в функции count_appearance
+    """
+    pass
+
+
+class CountAppearanceWrongData(CountAppearanceException):
+    """
+    Неверный формат аргумента на входе функции
+    """
+    pass
+
+
+class CountAppearanceWrongInterval(CountAppearanceException):
+    """
+    Неверно указаны временные интервалы
+    """
+    pass
+
+
 def count_appearance(data:dict) -> int:
     """
     Функция полуает на вход спиок с интервалами урока и присутсвия учителя и ученика,
@@ -11,11 +32,27 @@ def count_appearance(data:dict) -> int:
             каждый четный элемент - время входа на урок, каждый нечетный - время выхода)
     :return: общее время присутвия ученика и учителя на уроке одновременно
     """
-    lesson = data['lesson']
-    pupil = data['pupil']
-    tutor = data['tutor']
+    if not isinstance(data, dict):
+        raise CountAppearanceWrongData(f'На входе ожидается словарь, получен {type(data)}')
+
+    try:
+        lesson = data['lesson']
+        pupil = data['pupil']
+        tutor = data['tutor']
+    except KeyError:
+        raise CountAppearanceWrongData("В словаре должны быть ключи 'lesson', 'pupil' и 'tutor'")
+
+    if not (isinstance(lesson, list) and isinstance(pupil, list) and isinstance(tutor, list)):
+        raise CountAppearanceWrongData('В словаре значения должны быть в виде списков')
+
     if not pupil or not tutor or not lesson:
         return 0
+
+    if len(lesson) != 2:
+        raise CountAppearanceWrongInterval("Интервал урока должен быть указан в виде списка из двух чисел")
+    if len(pupil) % 2 != 0 or len(tutor) % 2 != 0:
+        raise CountAppearanceWrongInterval("Интервалы присутствия учителя и ученика должны быть в виде списков \
+                                           с четным числом элементов")
 
     appearance = 0
     p_pos = 0
@@ -39,6 +76,8 @@ def count_appearance(data:dict) -> int:
         p_end = new_pupil[p_pos + 1]
         t_start = tutor[t_pos]
         t_end = tutor[t_pos + 1]
+        if p_start > p_end or t_start > t_end:
+            raise CountAppearanceWrongInterval('Начало интервала больше конца интервала')
         # проверка на пересечение интервалов
         if p_start < t_end and p_end > t_start:
             # добавляем пересечение с учетом интервала урока
